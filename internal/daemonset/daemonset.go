@@ -18,7 +18,6 @@ import (
 	"k8s.io/utils/pointer"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
-	"sigs.k8s.io/controller-runtime/pkg/log"
 )
 
 const (
@@ -172,13 +171,10 @@ func (dc *daemonSetGenerator) SetDriverContainerAsDesired(
 		},
 	}
 
-	logger := log.FromContext(ctx)
-	logger.Info("Checking for Volumes", "volumes", mld.Volumes)
 	for i := 0; i < len(mld.Volumes); i++ {
 		volumes = append(volumes, mld.Volumes[i])
 	}
 
-	logger.Info("Checking for VolumeMounts", "volumeMounts", mld.VolumeMounts)
 	for i := 0; i < len(mld.VolumeMounts); i++ {
 		container.VolumeMounts = append(container.VolumeMounts, mld.VolumeMounts[i])
 	}
