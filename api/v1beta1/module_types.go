@@ -42,6 +42,10 @@ type KanikoParams struct {
 	// +optional
 	// Kaniko image tag to use when creating the build Job
 	Tag string `json:"tag,omitempty"`
+
+	//+optional
+	// Configure Kaniko to cache layers
+	Cache bool `json:"cache,omitempty`
 }
 
 type Build struct {
