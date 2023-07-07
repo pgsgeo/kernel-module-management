@@ -215,6 +215,10 @@ type ModuleLoaderContainerSpec struct {
 	// +optional
 	ContainerImage string `json:"containerImage,omitempty"`
 
+	// VolumeMounts is a list of volume mounts that are appended to the default ones.
+	// +optional
+	VolumeMounts []v1.VolumeMount `json:"volumeMounts,omitempty"`
+
 	// Image pull policy.
 	// One of Always, Never, IfNotPresent.
 	// Defaults to Always if :latest tag is specified, or IfNotPresent otherwise.
@@ -250,6 +254,10 @@ type ModuleLoaderSpec struct {
 	// ServiceAccountName is the name of the ServiceAccount to use to run this pod.
 	// More info: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
 	ServiceAccountName string `json:"serviceAccountName,omitempty"`
+
+	// +optional
+	// Volumes list of volume to add to the ModuleLoader DS spec
+	Volumes []v1.Volume `json:"volumes,omitempty"`
 }
 
 type DevicePluginContainerSpec struct {

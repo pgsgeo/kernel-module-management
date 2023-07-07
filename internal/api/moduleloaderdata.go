@@ -42,6 +42,12 @@ type ModuleLoaderData struct {
 	// ContainerImage is a top-level field
 	ContainerImage string
 
+	//VolumeMounts is a list of VolumeMount to add to the container spec
+	VolumeMounts []v1.VolumeMount
+
+	//Volume is a list of Volume to add to the DS spec
+	Volumes []v1.Volume
+
 	// Image pull policy.
 	ImagePullPolicy v1.PullPolicy
 
