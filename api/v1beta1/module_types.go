@@ -168,6 +168,16 @@ type ModprobeSpec struct {
 	// +optional
 	FirmwarePath string `json:"firmwarePath,omitempty"`
 
+	//LoaderCommandOverride allow to override the default lifecycle PostStart command by passing
+	//a set of commands to run
+	// +optional
+	LoaderCommandOverride []string `json:loaderCommandOVerride,omitempty`
+
+	//UnloaderCommandOverride allow to override the default lifecycle PreStop command by passing
+	//a set of commands to run
+	// +optional
+	UnloaderCommandOverride []string `json:unloaderCommandOVerride,omitempty`
+
 	// ModulesLoadingOrder defines the dependency between kernel modules loading, in case
 	// it was not created by depmod (independent kernel modules).
 	// The list order should be: upmost module, then the module it depends on and so on.

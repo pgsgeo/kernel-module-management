@@ -109,6 +109,20 @@ func (dc *daemonSetGenerator) SetDriverContainerAsDesired(
 	hostPathDirectory := v1.HostPathDirectory
 	hostPathDirectoryOrCreate := v1.HostPathDirectoryOrCreate
 
+	var lifecyclePostStartCommand []string
+	if len(mld.Modprobe.LoaderCommandOverride) > 0 {
+		lifecyclePostStartCommand = mld.Modprobe.LoaderCommandOverride
+	} else {
+		lifecyclePostStartCommand = makeLoadCommand(mld.InTreeModuleToRemove, mld.Modprobe, mld.Name)
+	}
+
+	var lifecyclePreStopCommand []string
+	if len(mld.Modprobe.LoaderCommandOverride) > 0 {
+		lifecyclePreStopCommand = mld.Modprobe.UnloaderCommandOverride
+	} else {
+		lifecyclePreStopCommand = makeUnloadCommand(mld.Modprobe, mld.Name)
+	}
+
 	container := v1.Container{
 		Command:         []string{"sleep", "infinity"},
 		Name:            "module-loader",
@@ -117,12 +131,12 @@ func (dc *daemonSetGenerator) SetDriverContainerAsDesired(
 		Lifecycle: &v1.Lifecycle{
 			PostStart: &v1.LifecycleHandler{
 				Exec: &v1.ExecAction{
-					Command: makeLoadCommand(mld.InTreeModuleToRemove, mld.Modprobe, mld.Name),
+					Command: lifecyclePostStartCommand,
 				},
 			},
 			PreStop: &v1.LifecycleHandler{
 				Exec: &v1.ExecAction{
-					Command: makeUnloadCommand(mld.Modprobe, mld.Name),
+					Command: lifecyclePreStopCommand,
 				},
 			},
 		},
