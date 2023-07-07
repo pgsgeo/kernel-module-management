@@ -117,7 +117,7 @@ func (dc *daemonSetGenerator) SetDriverContainerAsDesired(
 	}
 
 	var lifecyclePreStopCommand []string
-	if len(mld.Modprobe.LoaderCommandOverride) > 0 {
+	if len(mld.Modprobe.UnloaderCommandOverride) > 0 {
 		lifecyclePreStopCommand = mld.Modprobe.UnloaderCommandOverride
 	} else {
 		lifecyclePreStopCommand = makeUnloadCommand(mld.Modprobe, mld.Name)
@@ -219,6 +219,11 @@ func (dc *daemonSetGenerator) SetDriverContainerAsDesired(
 		container.VolumeMounts = append(container.VolumeMounts, softDepVolumeMount)
 	}
 
+	enableHostNetwork := false
+	if mld.Modprobe.EnableHostNetwork {
+		enableHostNetwork = true
+	}
+
 	ds.Spec = appsv1.DaemonSetSpec{
 		Template: v1.PodTemplateSpec{
 			ObjectMeta: metav1.ObjectMeta{
@@ -227,6 +232,7 @@ func (dc *daemonSetGenerator) SetDriverContainerAsDesired(
 				Annotations: modulesOrderAnnotations,
 			},
 			Spec: v1.PodSpec{
+				HostNetwork:        enableHostNetwork,
 				Containers:         []v1.Container{container},
 				ImagePullSecrets:   GetPodPullSecrets(mld.ImageRepoSecret),
 				NodeSelector:       nodeSelector,

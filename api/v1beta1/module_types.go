@@ -45,7 +45,7 @@ type KanikoParams struct {
 
 	//+optional
 	// Configure Kaniko to cache layers
-	Cache bool `json:"cache,omitempty`
+	Cache bool `json:"cache,omitempty"`
 }
 
 type Build struct {
@@ -168,15 +168,20 @@ type ModprobeSpec struct {
 	// +optional
 	FirmwarePath string `json:"firmwarePath,omitempty"`
 
+	// EnableHostNetwork allow to run modprobe in the host network namespace by
+	// setting podSpec.HostNetwork true
+	// +optional
+	EnableHostNetwork bool `json:"enableHostNetwork,omitempty"`
+
 	//LoaderCommandOverride allow to override the default lifecycle PostStart command by passing
 	//a set of commands to run
 	// +optional
-	LoaderCommandOverride []string `json:loaderCommandOVerride,omitempty`
+	LoaderCommandOverride []string `json:"loaderCommandOverride,omitempty"`
 
 	//UnloaderCommandOverride allow to override the default lifecycle PreStop command by passing
 	//a set of commands to run
 	// +optional
-	UnloaderCommandOverride []string `json:unloaderCommandOVerride,omitempty`
+	UnloaderCommandOverride []string `json:"unloaderCommandOverride,omitempty"`
 
 	// ModulesLoadingOrder defines the dependency between kernel modules loading, in case
 	// it was not created by depmod (independent kernel modules).

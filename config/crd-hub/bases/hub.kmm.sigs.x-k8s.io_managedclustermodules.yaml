@@ -2079,6 +2079,9 @@ spec:
                                 description: KanikoParams is used to customize the
                                   building process of the image.
                                 properties:
+                                  cache:
+                                    description: Configure Kaniko to cache layers
+                                    type: boolean
                                   tag:
                                     description: Kaniko image tag to use when creating
                                       the build Job
@@ -2192,6 +2195,9 @@ spec:
                                       description: KanikoParams is used to customize
                                         the building process of the image.
                                       properties:
+                                        cache:
+                                          description: Configure Kaniko to cache layers
+                                          type: boolean
                                         tag:
                                           description: Kaniko image tag to use when
                                             creating the build Job
@@ -2355,11 +2361,23 @@ spec:
                                 description: DirName is the root directory for modules.
                                   It adds `-d ${DirName}` to the modprobe command-line.
                                 type: string
+                              enableHostNetwork:
+                                description: EnableHostNetwork allow to run modprobe
+                                  in the host network namespace by setting podSpec.HostNetwork
+                                  true
+                                type: boolean
                               firmwarePath:
                                 description: FirmwarePath is the path of the firmware(s).
                                   The firmware(s) will be copied to the host for the
                                   kernel to find them.
                                 type: string
+                              loaderCommandOverride:
+                                description: LoaderCommandOverride allow to override
+                                  the default lifecycle PostStart command by passing
+                                  a set of commands to run
+                                items:
+                                  type: string
+                                type: array
                               moduleName:
                                 description: ModuleName is the name of the Module
                                   to be loaded.
@@ -2408,6 +2426,13 @@ spec:
                                     minItems: 1
                                     type: array
                                 type: object
+                              unloaderCommandOverride:
+                                description: UnloaderCommandOverride allow to override
+                                  the default lifecycle PreStop command by passing
+                                  a set of commands to run
+                                items:
+                                  type: string
+                                type: array
                             required:
                             - moduleName
                             type: object
