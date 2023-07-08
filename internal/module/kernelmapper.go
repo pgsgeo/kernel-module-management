@@ -120,6 +120,7 @@ func (kh *kernelMapperHelper) prepareModuleLoaderData(mapping *kmmv1beta1.Kernel
 
 	mld.VolumeMounts = mod.Spec.ModuleLoader.Container.VolumeMounts
 	mld.Volumes = mod.Spec.ModuleLoader.Volumes
+	mld.Privileged = mod.Spec.ModuleLoader.Container.Privileged
 
 	mld.KernelVersion = kernelVersion
 	mld.Name = mod.Name

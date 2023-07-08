@@ -123,6 +123,25 @@ func (dc *daemonSetGenerator) SetDriverContainerAsDesired(
 		lifecyclePreStopCommand = makeUnloadCommand(mld.Modprobe, mld.Name)
 	}
 
+	var securityContext v1.SecurityContext
+
+	if mld.Privileged {
+		securityContext = v1.SecurityContext{
+			Privileged: pointer.Bool(true),
+		}
+	} else {
+		securityContext = v1.SecurityContext{
+			AllowPrivilegeEscalation: pointer.Bool(false),
+			Capabilities: &v1.Capabilities{
+				Add: []v1.Capability{"SYS_MODULE"},
+			},
+			RunAsUser: pointer.Int64(0),
+			SELinuxOptions: &v1.SELinuxOptions{
+				Type: "spc_t",
+			},
+		}
+	}
+
 	container := v1.Container{
 		Command:         []string{"sleep", "infinity"},
 		Name:            "module-loader",
@@ -140,16 +159,7 @@ func (dc *daemonSetGenerator) SetDriverContainerAsDesired(
 				},
 			},
 		},
-		SecurityContext: &v1.SecurityContext{
-			AllowPrivilegeEscalation: pointer.Bool(false),
-			Capabilities: &v1.Capabilities{
-				Add: []v1.Capability{"SYS_MODULE"},
-			},
-			RunAsUser: pointer.Int64(0),
-			SELinuxOptions: &v1.SELinuxOptions{
-				Type: "spc_t",
-			},
-		},
+		SecurityContext: &securityContext,
 		VolumeMounts: []v1.VolumeMount{
 			{
 				Name:      nodeLibModulesVolumeName,

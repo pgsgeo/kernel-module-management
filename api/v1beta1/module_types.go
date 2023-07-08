@@ -219,6 +219,10 @@ type ModuleLoaderContainerSpec struct {
 	// +optional
 	VolumeMounts []v1.VolumeMount `json:"volumeMounts,omitempty"`
 
+	// Privileged set the container to fully priviledged
+	// +optional
+	Privileged bool `json:"privileged,omitempty"`
+
 	// Image pull policy.
 	// One of Always, Never, IfNotPresent.
 	// Defaults to Always if :latest tag is specified, or IfNotPresent otherwise.

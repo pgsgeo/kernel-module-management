@@ -48,6 +48,9 @@ type ModuleLoaderData struct {
 	//Volume is a list of Volume to add to the DS spec
 	Volumes []v1.Volume
 
+	//Privileged if the container is privileged
+	Privileged bool
+
 	// Image pull policy.
 	ImagePullPolicy v1.PullPolicy
 

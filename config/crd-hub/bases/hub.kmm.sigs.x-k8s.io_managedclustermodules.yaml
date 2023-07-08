@@ -2436,6 +2436,9 @@ spec:
                             required:
                             - moduleName
                             type: object
+                          privileged:
+                            description: Privileged set the container to fully priviledged
+                            type: boolean
                           registryTLS:
                             description: RegistryTLS set the TLS configs for accessing
                               the registry of the module-loader's image.
