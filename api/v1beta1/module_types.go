@@ -42,6 +42,10 @@ type KanikoParams struct {
 	// +optional
 	// Kaniko image tag to use when creating the build Job
 	Tag string `json:"tag,omitempty"`
+
+	//+optional
+	// Configure Kaniko to cache layers
+	Cache bool `json:"cache,omitempty"`
 }
 
 type Build struct {
@@ -164,6 +168,21 @@ type ModprobeSpec struct {
 	// +optional
 	FirmwarePath string `json:"firmwarePath,omitempty"`
 
+	// EnableHostNetwork allow to run modprobe in the host network namespace by
+	// setting podSpec.HostNetwork true
+	// +optional
+	EnableHostNetwork bool `json:"enableHostNetwork,omitempty"`
+
+	//LoaderCommandOverride allow to override the default lifecycle PostStart command by passing
+	//a set of commands to run
+	// +optional
+	LoaderCommandOverride []string `json:"loaderCommandOverride,omitempty"`
+
+	//UnloaderCommandOverride allow to override the default lifecycle PreStop command by passing
+	//a set of commands to run
+	// +optional
+	UnloaderCommandOverride []string `json:"unloaderCommandOverride,omitempty"`
+
 	// ModulesLoadingOrder defines the dependency between kernel modules loading, in case
 	// it was not created by depmod (independent kernel modules).
 	// The list order should be: upmost module, then the module it depends on and so on.
@@ -195,6 +214,14 @@ type ModuleLoaderContainerSpec struct {
 	// ContainerImage is a top-level field
 	// +optional
 	ContainerImage string `json:"containerImage,omitempty"`
+
+	// VolumeMounts is a list of volume mounts that are appended to the default ones.
+	// +optional
+	VolumeMounts []v1.VolumeMount `json:"volumeMounts,omitempty"`
+
+	// Privileged set the container to fully priviledged
+	// +optional
+	Privileged bool `json:"privileged,omitempty"`
 
 	// Image pull policy.
 	// One of Always, Never, IfNotPresent.
@@ -231,6 +258,10 @@ type ModuleLoaderSpec struct {
 	// ServiceAccountName is the name of the ServiceAccount to use to run this pod.
 	// More info: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
 	ServiceAccountName string `json:"serviceAccountName,omitempty"`
+
+	// +optional
+	// Volumes list of volume to add to the ModuleLoader DS spec
+	Volumes []v1.Volume `json:"volumes,omitempty"`
 }
 
 type DevicePluginContainerSpec struct {

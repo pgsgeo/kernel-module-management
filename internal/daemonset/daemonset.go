@@ -109,24 +109,28 @@ func (dc *daemonSetGenerator) SetDriverContainerAsDesired(
 	hostPathDirectory := v1.HostPathDirectory
 	hostPathDirectoryOrCreate := v1.HostPathDirectoryOrCreate
 
-	container := v1.Container{
-		Command:         []string{"sleep", "infinity"},
-		Name:            "module-loader",
-		Image:           mld.ContainerImage,
-		ImagePullPolicy: mld.ImagePullPolicy,
-		Lifecycle: &v1.Lifecycle{
-			PostStart: &v1.LifecycleHandler{
-				Exec: &v1.ExecAction{
-					Command: makeLoadCommand(mld.InTreeModuleToRemove, mld.Modprobe, mld.Name),
-				},
-			},
-			PreStop: &v1.LifecycleHandler{
-				Exec: &v1.ExecAction{
-					Command: makeUnloadCommand(mld.Modprobe, mld.Name),
-				},
-			},
-		},
-		SecurityContext: &v1.SecurityContext{
+	var lifecyclePostStartCommand []string
+	if len(mld.Modprobe.LoaderCommandOverride) > 0 {
+		lifecyclePostStartCommand = mld.Modprobe.LoaderCommandOverride
+	} else {
+		lifecyclePostStartCommand = makeLoadCommand(mld.InTreeModuleToRemove, mld.Modprobe, mld.Name)
+	}
+
+	var lifecyclePreStopCommand []string
+	if len(mld.Modprobe.UnloaderCommandOverride) > 0 {
+		lifecyclePreStopCommand = mld.Modprobe.UnloaderCommandOverride
+	} else {
+		lifecyclePreStopCommand = makeUnloadCommand(mld.Modprobe, mld.Name)
+	}
+
+	var securityContext v1.SecurityContext
+
+	if mld.Privileged {
+		securityContext = v1.SecurityContext{
+			Privileged: pointer.Bool(true),
+		}
+	} else {
+		securityContext = v1.SecurityContext{
 			AllowPrivilegeEscalation: pointer.Bool(false),
 			Capabilities: &v1.Capabilities{
 				Add: []v1.Capability{"SYS_MODULE"},
@@ -135,7 +139,27 @@ func (dc *daemonSetGenerator) SetDriverContainerAsDesired(
 			SELinuxOptions: &v1.SELinuxOptions{
 				Type: "spc_t",
 			},
+		}
+	}
+
+	container := v1.Container{
+		Command:         []string{"sleep", "infinity"},
+		Name:            "module-loader",
+		Image:           mld.ContainerImage,
+		ImagePullPolicy: mld.ImagePullPolicy,
+		Lifecycle: &v1.Lifecycle{
+			PostStart: &v1.LifecycleHandler{
+				Exec: &v1.ExecAction{
+					Command: lifecyclePostStartCommand,
+				},
+			},
+			PreStop: &v1.LifecycleHandler{
+				Exec: &v1.ExecAction{
+					Command: lifecyclePreStopCommand,
+				},
+			},
 		},
+		SecurityContext: &securityContext,
 		VolumeMounts: []v1.VolumeMount{
 			{
 				Name:      nodeLibModulesVolumeName,
@@ -155,6 +179,14 @@ func (dc *daemonSetGenerator) SetDriverContainerAsDesired(
 				},
 			},
 		},
+	}
+
+	for i := 0; i < len(mld.Volumes); i++ {
+		volumes = append(volumes, mld.Volumes[i])
+	}
+
+	for i := 0; i < len(mld.VolumeMounts); i++ {
+		container.VolumeMounts = append(container.VolumeMounts, mld.VolumeMounts[i])
 	}
 
 	if fw := mld.Modprobe.FirmwarePath; fw != "" {
@@ -205,6 +237,11 @@ func (dc *daemonSetGenerator) SetDriverContainerAsDesired(
 		container.VolumeMounts = append(container.VolumeMounts, softDepVolumeMount)
 	}
 
+	enableHostNetwork := false
+	if mld.Modprobe.EnableHostNetwork {
+		enableHostNetwork = true
+	}
+
 	ds.Spec = appsv1.DaemonSetSpec{
 		Template: v1.PodTemplateSpec{
 			ObjectMeta: metav1.ObjectMeta{
@@ -213,6 +250,7 @@ func (dc *daemonSetGenerator) SetDriverContainerAsDesired(
 				Annotations: modulesOrderAnnotations,
 			},
 			Spec: v1.PodSpec{
+				HostNetwork:        enableHostNetwork,
 				Containers:         []v1.Container{container},
 				ImagePullSecrets:   GetPodPullSecrets(mld.ImageRepoSecret),
 				NodeSelector:       nodeSelector,

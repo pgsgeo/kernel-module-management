@@ -180,6 +180,10 @@ func (m *maker) containerArgs(
 		args = append(args, "--skip-tls-verify-pull")
 	}
 
+	if buildConfig.KanikoParams != nil && buildConfig.KanikoParams.Cache {
+		args = append(args, "--cache=true")
+	}
+
 	if pushImage {
 		if mld.RegistryTLS.Insecure {
 			args = append(args, "--insecure")

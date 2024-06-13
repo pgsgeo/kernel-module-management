@@ -266,6 +266,16 @@ func (in *ModprobeSpec) DeepCopyInto(out *ModprobeSpec) {
 		*out = new(ModprobeArgs)
 		(*in).DeepCopyInto(*out)
 	}
+	if in.LoaderCommandOverride != nil {
+		in, out := &in.LoaderCommandOverride, &out.LoaderCommandOverride
+		*out = make([]string, len(*in))
+		copy(*out, *in)
+	}
+	if in.UnloaderCommandOverride != nil {
+		in, out := &in.UnloaderCommandOverride, &out.UnloaderCommandOverride
+		*out = make([]string, len(*in))
+		copy(*out, *in)
+	}
 	if in.ModulesLoadingOrder != nil {
 		in, out := &in.ModulesLoadingOrder, &out.ModulesLoadingOrder
 		*out = make([]string, len(*in))
